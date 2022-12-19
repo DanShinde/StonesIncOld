@@ -1,1 +1,1 @@
-# StonesInc
+info about this project

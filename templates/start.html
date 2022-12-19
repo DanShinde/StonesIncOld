@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static',filename='styles/new.css') }}"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="login-box">
+    
+      <h2>Hello</h2>
+      <form action="{{ url_for('create_folder') }}" method="post" >
+        <div class="user-box">
+          <label for="input">You can select from existing here:</label><br />
+          <div class="formbuilder-select form-group field-select-1671271428957">
+            <label for="select-1671271428957" class="formbuilder-select-label"
+              >You can select from existing here:</label
+            ><br />
+            <select
+              class="form-control"
+              name="folder"
+              id="folder"
+            >
+              {% for option in options %}
+              <option>{{ option }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div class="user-box">
+        
+          <input type="text" name="folder_name" value="" placeholder="Enter the Folder Name" /><br />
+    <button class="submit-button" type="submit">
+        <h3>
+        Select Folder
+</h3>
+        </button>
+   <br>
+</div>
+
+      </form>
+          <div class="divi">
+      <form action="{{ url_for('start_Photos') }}" method="post" align="Center">
+        <h2>
+        Selected Folder is : {{FolderN}}</h2><br />
+            <button class="submit-button" type="submit">
+        <h3>   Start</h3>
+        </button>
+      </form>
+    </div>
+    <button class= "submit-button" onclick="window.location.href='{{ url_for('browse_folder')  }}';">Browse</button>
+<button class= "submit-button" onclick="window.location.href='{{ url_for('take_Video')  }}';">RecordVideo</button>
+
+    
+</div>
+    </body>
+  </body>
+</html>
