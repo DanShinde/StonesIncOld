@@ -64,15 +64,20 @@ def start_Photos():
     capture_and_save_image(FolderName)
     return redirect(url_for('home'))
 
-@app.route('/browse')
+@app.route('/browser')
 def browse_folder():
     folder = 'static/StoredData'
     files = os.listdir(folder)
     return render_template('browse.html', files=files)
 
-@app.route('/browse/<path:filename>')
-def serve_file(filename):
-    return send_from_directory("static/StoredData", filename)
+@app.route('StoredData/<path:path>')
+def view_media(path):
+    if path.endswith('.jpg') or path.endswith('.png'):
+        return render_template('view_image.html', image=path)
+    elif path.endswith('.mp4'):
+        return render_template('view_video.html', video=path)
+
+
 
 @app.route('/take_video', methods=["GET", "POST"])
 def take_Video():

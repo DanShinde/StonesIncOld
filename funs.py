@@ -122,14 +122,15 @@ def capture_image():
 
 def capture_and_save_image(folder):
     # Capture an image and get the image data as a BytesIO object
-    image_data = capture_image()
+    for i in range(1, 13):
+        image_data = capture_image()
     # Generate a unique file name
-    file_name = str(uuid.uuid4()) + '.jpg'
+        file_name = str(folder) + f'_{i}.jpg'
 
     # Save the image to the static folder
-    file_path = os.path.join('static/StoredData/'+ folder, file_name)
-    with open(file_path, 'wb') as f:
-        f.write(image_data.getvalue())
+        file_path = os.path.join('static/StoredData/'+ folder, file_name)
+        with open(file_path, 'wb') as f:
+            f.write(image_data.getvalue())
 
 def capture_video():
     # Create an instance of the PiCamera class
