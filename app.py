@@ -70,23 +70,24 @@ def browse_folder():
     files = os.listdir(folder)
     return render_template('browse.html', files=files)
 
-@app.route('StoredData/<path:path>')
+@app.route('/StoredData/<path:path>')
 def view_media(path):
-    if path.endswith('.jpg') or path.endswith('.png'):
-        return render_template('view_image.html', image=path)
-    elif path.endswith('.mp4'):
-        return render_template('view_video.html', video=path)
-
+    directory = '/static/StoredData'
+    imgfiles = os.listdir(f"static/StoredData/{path}")
+    imgfiles.sort()
+    return render_template('view_media.html', files=imgfiles, path=path)
 
 
 @app.route('/take_video', methods=["GET", "POST"])
 def take_Video():
     FolderName = session.get('selectedFolder')
     save_Video(FolderName)
-    capture_and_save_image(FolderName)
     return redirect(url_for('home'))
 
 
 
 if __name__ =="__main__":\
     app.run(debug=True)
+
+
+

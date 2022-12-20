@@ -73,7 +73,7 @@ class StepperMotor(object):
         for pin_idx in range(len(self.gpio_list)):
             GPIO.output(self.gpio_list[pin_idx], int(self.phase.astype(int)[pin_idx]))
 
-    def rotate(self, direction, degrees=0, delay=0.002):
+    def rotate(self,  degrees=0, delay=0.002):
         """
         Perform rotation with direction and angle info.
 
@@ -122,10 +122,12 @@ def capture_image():
 
 def capture_and_save_image(folder):
     # Capture an image and get the image data as a BytesIO object
+    motor = StepperMotor(GPIO_PIN_LIST)
     for i in range(1, 13):
         image_data = capture_image()
+        motor.rotate(degrees=30)
     # Generate a unique file name
-        file_name = str(folder) + f'_{i}.jpg'
+        file_name = str(folder) + f'_{i:02d}.jpg'
 
     # Save the image to the static folder
         file_path = os.path.join('static/StoredData/'+ folder, file_name)
@@ -143,11 +145,12 @@ def capture_video():
     video_buffer = io.BytesIO()
     # Start recording the video
     camera.start_recording(video_buffer, format='h264')
+    print("Recording Started")
     # Record for 10 seconds
     camera.wait_recording(1)
     GPIO_PIN_LIST = [5,6,13,19]
     Motor = StepperMotor(GPIO_PIN_LIST)
-    Motor.rotate(direction=True, degrees=360)
+    Motor.rotate(degrees=360, delay=0.01)
     # Stop recording and close the camera
     camera.wait_recording(1)
     camera.stop_recording()
