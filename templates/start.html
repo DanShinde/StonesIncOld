@@ -9,7 +9,7 @@
       type="text/css"
       href="{{ url_for('static',filename='styles/new.css') }}"
     />
-    <title>Document</title>
+    <title>Stones Inc.</title>
   </head>
   <body>
     <div class="login-box">
@@ -39,14 +39,13 @@
           <input type="text" name="folder_name" value="" placeholder="Enter the Folder Name" /><br />
     <button class="submit-button" type="submit">
         <h3>
-        Select Folder
-</h3>
+        Select Folder</h3>
         </button>
    <br>
 </div>
-
+<div class="divi">
       </form>
-          <div class="divi">
+          
       <form action="{{ url_for('start_Photos') }}" method="post" align="Center">
         <h2>
         Selected Folder is : {{FolderN}}</h2><br />
@@ -54,12 +53,37 @@
         <h3>   Start</h3>
         </button>
       </form>
-    </div>
-<button class= "submit-button" onclick="window.location.href='{{ url_for('browse_folder')  }}';">Browse</button>
-<button class= "submit-button" onclick="window.location.href='{{ url_for('take_Video')  }}';">RecordVideo</button>
 
-    
+    </div>
+<button class= "submit-button"  onclick="redirectToRoute('/browser')">Browse</button>   
 </div>
+<div class="feed">
+  <button id="start-button" onclick="callRoute('/start_stream')">Start Stream</button>
+<button id="stop-button" onclick="callRoute('/stop_stream')">Stop Stream</button>
+<button id="Rec-On"  onclick="callRoute('/rec_on')">Start Rec</button>
+<button id="Rec-Off" onclick="callRoute('/rec_off')">Stop Rec</button>
+
+  <img src="/video_feed" id="video" />
+</div>
+<script>
+
+// Create an XMLHttpRequest object
+const xhr = new XMLHttpRequest();
+
+  // Function to start the stream
+function callRoute(Route) {
+  // Send a request to the server to start the stream
+  xhr.open("POST", Route, true);
+  xhr.send();
+  console.log("Success")
+}
+
+function redirectToRoute(route) {
+  window.location.href = route;
+}
+
+
+</script>
     </body>
-  </body>
+
 </html>
