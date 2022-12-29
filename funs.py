@@ -8,7 +8,7 @@
 ##############################################################################################
 import os
 import time
-import uuid
+import cv2
 import RPi.GPIO as GPIO
 import numpy as np
 import io
@@ -102,7 +102,7 @@ def create_options(app,folder_path):
     return options
 
 
-
+"""
 def capture_image():
     # Create a BytesIO object to store the image data
     image_data = io.BytesIO()
@@ -117,9 +117,34 @@ def capture_image():
     camera.close()
     image_data.seek(0)
     return image_data
+"""
+def capture_image():
+    # Open the video capture device
+    cap = cv2.VideoCapture(0)
+    # Set the resolution of the capture device
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    # Capture a frame from the video stream
+    success, frame = cap.read()
+    # Check if the frame was successfully read
+    if not success:
+        print("Error: Unable to read frame from video stream")
+        return None
+    # Rotate the frame 180 degrees
+    frame = cv2.flip(frame, -1)
+    # Create a BytesIO object to store the image data
+    image_data = io.BytesIO()
+    # Encode the frame as JPEG
+    ret, jpeg = cv2.imencode('.jpg', frame)
+    # Write the JPEG data to the BytesIO object
+    image_data.write(jpeg.tobytes())
+    # Reset the position of the BytesIO object to the beginning
+    image_data.seek(0)
+    # Release the video capture device
+    cap.release()
+    return image_data
 
-
-
+"""
 def capture_and_save_image(folder):
     # Capture an image and get the image data as a BytesIO object
     motor = StepperMotor(GPIO_PIN_LIST)
@@ -133,18 +158,40 @@ def capture_and_save_image(folder):
         file_path = os.path.join('static/StoredData/'+ folder, file_name)
         with open(file_path, 'wb') as f:
             f.write(image_data.getvalue())
+"""
+def capture_and_save_image(folder):
+    # Capture an image and get the image data as a BytesIO object
+    motor = StepperMotor(GPIO_PIN_LIST)
+    for i in range(1, 13):
+        image_data = capture_image()
+        if image_data is None:
+            # Handle the error here
+            print("Error: Unable to capture image")
+            continue
+        motor.rotate(degrees=30)
+    # Generate a unique file name
+        file_name = str(folder) + f'_{i:02d}.jpg'
 
+    # Save the image to the static folder
+        file_path = os.path.join('static/StoredData/'+ folder, file_name)
+        # Load the image data from the BytesIO object
+        image = cv2.imdecode(np.frombuffer(image_data.getvalue(), np.uint8), -1)
+        # Save the image to the file
+        cv2.imwrite(file_path, image)
+
+
+"""
 def capture_video():
     # Create an instance of the PiCamera class
     camera = picamera.PiCamera()
     # Set the resolution and framerate of the video
     camera.rotation=180
     camera.resolution = (1024, 768)
-    camera.framerate = 30
+    camera.framerate = 90
     # Create a BytesIO object to store the video
     video_buffer = io.BytesIO()
     # Start recording the video
-    camera.start_recording(video_buffer, format='h264')
+    camera.start_recording(video_buffer, format='h264', level='4.2')
     print("Recording Started")
     # Record for 10 seconds
     camera.wait_recording(1)
@@ -158,7 +205,37 @@ def capture_video():
     # Seek to the beginning of the BytesIO object
     video_buffer.seek(0)
     return video_buffer
+"""
+def capture_video():
+    # Open the video capture device
+    cap = cv2.VideoCapture(0)
+    # Set the resolution and framerate of the video
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    cap.set(cv2.CAP_PROP_FPS, 90)
+    # Create a VideoWriter object to store the video
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    video_buffer = cv2.VideoWriter('video.avi', fourcc, 90, (1024,768))
+    print("Recording Started")
+    # Record for 10 seconds
+    start_time = time.time()
+    while time.time() - start_time < 1:
+        # Read a frame from the video stream
+        success, frame = cap.read()
+        # Rotate the frame 180 degrees
+        frame = cv2.flip(frame, -1)
+        # Write the frame to the VideoWriter object
+        video_buffer.write(frame)
+        # Rotate the motor
+        GPIO_PIN_LIST = [5, 6, 13, 19]
+        Motor = StepperMotor(GPIO_PIN_LIST)
+        Motor.rotate(degrees=360, delay=0.01)
+    # Release the video capture device and the VideoWriter object
+    cap.release()
+    video_buffer.release()
+    return video_buffer
 
+"""
 def save_Video(folder):
     video_bytes = capture_video()
     # Save the image to the static folder
@@ -166,4 +243,20 @@ def save_Video(folder):
     
     with open(file_path, 'wb') as f:
         f.write(video_bytes.getvalue())
-    
+    """
+
+def save_Video(folder):
+    # Capture the video and get the VideoWriter object
+    video_buffer = capture_video()
+    # Save the video to the static folder
+    file_path = os.path.join('static/StoredData/' + folder, 'Video1.avi')
+    # Define the codec to be used for the video
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    # Load the video from the VideoWriter object
+    cap = cv2.VideoCapture(video_buffer)
+    # Save the video to the file
+    cv2.VideoWriter(file_path, fourcc, 90, (1024, 768)).write(cap)
+    # Release the video capture device
+    cap.release()
+
+
